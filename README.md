@@ -1,6 +1,6 @@
 # Instagram Reels Downloader
 
-This project allows you to download Instagram Reels videos using links provided in a text file (`links.txt`). The downloaded videos are saved with their shortcode as the filename.
+This project lets you download Instagram Reels videos in bulk. You only need to copy all your links to (`links.txt`) and run the main.py. The downloaded videos are saved locally in a folder called "downloads"
 
 ## Features
 
@@ -20,18 +20,24 @@ This project allows you to download Instagram Reels videos using links provided 
 1. Clone the repository or download the project files.
 
 2. Install the required libraries:
-    ```bash
+    ```
     pip install instaloader tqdm
     ```
 
-3. Create a `links.txt` file in the project directory and add the Instagram Reels links, one per line.
+    or run
+   
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. Create a `links.txt` file in the project directory and add the Instagram Reels links, one per line.
 
 ## Usage
 
 1. Ensure your `links.txt` file is in the same directory as `main.py` and contains the Instagram Reels links you want to download.
 
 2. Run the script:
-    ```bash
+    ```
     python main.py
     ```
 
@@ -39,12 +45,15 @@ This project allows you to download Instagram Reels videos using links provided 
 
 ## Example
 
-`links.txt`: -https://www.instagram.com/reel/C6TqZ9_qCM2/?igsh=eXVrczI3cGlmeGhy
-              https://www.instagram.com/reel/C6TqZ9_qCM2/?igsh=eXVrczI3cGlmeGhy
+```
+links.txt: 
+    - https://www.instagram.com/reel/C6TqZ9_qCM2/?igsh=eXVrczI3cGlmeGhy
+    - https://www.instagram.com/reel/C6TqZ9_qCM2/?igsh=eXVrczI3cGlmeGhy
+```
 
 
 Running the script:
-```bash
+```
 python main.py
 ```
 
@@ -59,4 +68,11 @@ Reel C9t6Qk4t9X4.mp4 successfully downloaded.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+<a href="https://www.buymeacoffee.com/ascensao1" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
+## Author
+
+Bernardo Ascensao
 
