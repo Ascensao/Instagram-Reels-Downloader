@@ -67,7 +67,7 @@ def main():
     # Delete all files in the directory except .mp4 files
     remove_non_mp4_files(download_dir)
 
-    print("\nCongratulations, all links have been processed.")
+    print("\nCongratulations, all links have been downloaded.")
 
 if __name__ == "__main__":
     main()
