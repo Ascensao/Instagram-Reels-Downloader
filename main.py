@@ -2,61 +2,72 @@ import os
 import instaloader
 from tqdm import tqdm
 
-# Create an instance of Instaloader
-IL = instaloader.Instaloader()
+def configure_instaloader():
+    """Configure Instaloader settings."""
+    IL = instaloader.Instaloader()
+    IL.download_pictures = False
+    IL.download_video_thumbnails = False
+    IL.download_geotags = False
+    IL.download_comments = False
+    return IL
 
-IL.download_pictures = False
-IL.download_video_thumbnails = False
-IL.download_geotags = False
-IL.download_comments = False
-
-
-# Read links from links.txt
-with open('links.txt', 'r') as file:
-    links = file.read().splitlines()
-
-
-print(f"Founded {len(links)} reels links in links.txt")
-
+def read_links(filename):
+    """Read reel links from a file."""
+    with open(filename, 'r') as file:
+        return file.read().splitlines()
 
 def remove_non_mp4_files(directory):
-    # List all files in the directory
-    files = os.listdir(directory)
-
-    for file in files:
-        # If the file is not a .mp4, remove it
+    """Remove non-MP4 files from a directory."""
+    for file in os.listdir(directory):
         if not file.endswith('.mp4'):
             os.remove(os.path.join(directory, file))
 
-
-# Progress bar setup
-progress_bar = tqdm(total=len(links), desc="Downloading Reels", unit="link")
-
-
-# Process each link
-for link in links:
-    # Get the shortcode from the reel link
+def download_reel(IL, link, download_dir):
+    """Download a reel from a link and save it as an MP4 file."""
     shortcode = link.split("/")[-2]
     
     try:
-        # Download the video
         post = instaloader.Post.from_shortcode(IL.context, shortcode)
-        IL.download_post(post, "downloads")
+        IL.download_post(post, download_dir)
 
-        # Rename the video file
-        for file in os.listdir("/downloads"):
+        for file in os.listdir(download_dir):
             if file.endswith(".mp4") and not file.startswith(shortcode):
-                os.rename(os.path.join("downloads", file), os.path.join("downloads", f"{shortcode}.mp4"))
+                new_filename = os.path.join(download_dir, f"{shortcode}.mp4")
+                
+                if os.path.exists(new_filename):
+                    new_filename = os.path.join(download_dir, f"{shortcode}_{os.path.getmtime(new_filename)}.mp4")
+                
+                os.rename(os.path.join(download_dir, file), new_filename)
 
-        remove_non_mp4_files("downloads")
+        remove_non_mp4_files(download_dir)
         print(f"Reel {shortcode}.mp4 successfully downloaded.")
-    
+        return True
+
     except Exception as e:
         print(f"Failed to download {shortcode}: {e}")
-    
-    # Update progress bar
-    progress_bar.update(1)
+        return False
 
 
-progress_bar.close()
-print("\n Congratulations, all links has been processed.")
+def main():
+    """Main function to download reels from links."""
+    IL = configure_instaloader()
+    links = read_links('links.txt')
+    download_dir = "downloads"
+
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+
+    print(f"Found {len(links)} reel links in links.txt")
+
+    with tqdm(total=len(links), desc="Downloading Reels", unit="link") as progress_bar:
+        for link in links:
+            download_reel(IL, link, download_dir)
+            progress_bar.update(1)
+
+    # Delete all files in the directory except .mp4 files
+    remove_non_mp4_files(download_dir)
+
+    print("\nCongratulations, all links have been processed.")
+
+if __name__ == "__main__":
+    main()
