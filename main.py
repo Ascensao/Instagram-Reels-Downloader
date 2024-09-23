@@ -12,9 +12,10 @@ def configure_instaloader():
     return IL
 
 def read_links(filename):
-    """Read reel links from a file."""
+    """Read reel links from a file, ignoring blank lines and spaces."""
     with open(filename, 'r') as file:
-        return file.read().splitlines()
+        lines = file.read().splitlines()
+        return [line.strip() for line in lines if line.strip()]
 
 def remove_non_mp4_files(directory):
     """Remove non-MP4 files from a directory."""
@@ -24,9 +25,12 @@ def remove_non_mp4_files(directory):
 
 def download_reel(IL, link, download_dir):
     """Download a reel from a link and save it as an MP4 file."""
-    shortcode = link.split("/")[-2]
-    
+    if not link.startswith('http'):
+        print(f"Invalid link: {link}")
+        return False
+
     try:
+        shortcode = link.strip().split("/")[-2]
         post = instaloader.Post.from_shortcode(IL.context, shortcode)
         IL.download_post(post, download_dir)
 
@@ -40,13 +44,12 @@ def download_reel(IL, link, download_dir):
                 os.rename(os.path.join(download_dir, file), new_filename)
 
         remove_non_mp4_files(download_dir)
-        print(f"Reel {shortcode}.mp4 successfully downloaded.")
+        print(f"Reel {shortcode}.mp4 downloaded successfully.")
         return True
 
     except Exception as e:
-        print(f"Failed to download {shortcode}: {e}")
+        print(f"Failed to download {link}: {e}")
         return False
-
 
 def main():
     """Main function to download reels from links."""
@@ -64,10 +67,10 @@ def main():
             download_reel(IL, link, download_dir)
             progress_bar.update(1)
 
-    # Delete all files in the directory except .mp4 files
+    # Remove all files in the directory except .mp4 files
     remove_non_mp4_files(download_dir)
 
-    print("\nCongratulations, all links have been downloaded.")
+    print("\nCongratulations, all links have been processed.")
 
 if __name__ == "__main__":
     main()
