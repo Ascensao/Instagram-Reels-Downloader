@@ -1,6 +1,7 @@
 import os
 import instaloader
 from tqdm import tqdm
+import uuid
 
 def configure_instaloader():
     """Configure Instaloader settings."""
@@ -34,14 +35,15 @@ def download_reel(IL, link, download_dir):
         post = instaloader.Post.from_shortcode(IL.context, shortcode)
         IL.download_post(post, download_dir)
 
-        for file in os.listdir(download_dir):
-            if file.endswith(".mp4") and not file.startswith(shortcode):
-                new_filename = os.path.join(download_dir, f"{shortcode}.mp4")
-                
-                if os.path.exists(new_filename):
-                    new_filename = os.path.join(download_dir, f"{shortcode}_{os.path.getmtime(new_filename)}.mp4")
-                
-                os.rename(os.path.join(download_dir, file), new_filename)
+        # Find the downloaded video file
+        downloaded_files = [f for f in os.listdir(download_dir) if f.endswith('.mp4') and not f.startswith(shortcode)]
+        for file in downloaded_files:
+            source_file = os.path.join(download_dir, file)
+            # Ensure unique filename
+            unique_filename = f"{shortcode}_{uuid.uuid4().hex}.mp4"
+            new_filename = os.path.join(download_dir, unique_filename)
+
+            os.rename(source_file, new_filename)
 
         remove_non_mp4_files(download_dir)
         print(f"Reel {shortcode}.mp4 downloaded successfully.")
